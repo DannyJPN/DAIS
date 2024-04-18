@@ -1,0 +1,22 @@
+C:\Users\Petr\Documents\Visual Studio 2013\Projects\AuctionDesktopApp\AuctionDesktopApp\bin\Debug\AuctionDesktopApp.exe.config
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\bin\Debug\AuctionDesktopApp.exe.config
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\bin\Debug\AuctionDesktopApp.exe
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\bin\Debug\AuctionDesktopApp.pdb
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\bin\Debug\Oracle.ManagedDataAccess.dll
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.csprojAssemblyReference.cache
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.FormAbout.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.FormMain.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.Forms.FormAuctionDetail.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.Forms.FormAuctionGrid.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.Forms.FormCategoryDetail.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.Forms.FormCategoryGrid.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.Forms.FormUserDetail.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.Forms.FormUserGrid.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.Properties.Resources.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.Templates.FormDetail.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.Templates.FormGrid.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.csproj.GenerateResource.cache
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.csproj.CoreCompileInputs.cache
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.csproj.CopyComplete
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.exe
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Tasks\ex10\AuctionDesktopApp\AuctionDesktopApp\AuctionDesktopApp\obj\Debug\AuctionDesktopApp.pdb

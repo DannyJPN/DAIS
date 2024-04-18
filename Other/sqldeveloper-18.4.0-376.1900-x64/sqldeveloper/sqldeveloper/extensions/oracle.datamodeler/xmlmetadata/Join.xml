@@ -1,0 +1,10 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<oracle.dbtools.crest.model.design.relational.Join parentClass="oracle.dbtools.crest.model.design.relational.ColumnUsage">
+   <property name="leftColumn" dataType="oracle.dbtools.crest.model.design.relational.Column" defaultValue="" xmlName="leftColumn" xmlType="element" getter="getLeftColumn" setter="setLeftColumn" reffered="true"/>
+   <property name="leftColumnID" dataType="java.lang.String" defaultValue="" xmlName="leftColumnID" xmlType="element" getter="getLeftColumnID" setter="setLeftColumnID" reffered="false"/>
+   <property name="leftColumnName" dataType="java.lang.String" defaultValue="" xmlName="leftColumnName" xmlType="element" getter="getLeftColumnName" setter="setLeftColumnName" reffered="false"/>
+   <alias property="columnName" alias="rightColumnName"/>
+   <alias property="schema" alias="rightTableSchema"/>
+   <alias property="tableName" alias="rightTableName"/>
+   <alias property="usedColumnID" alias="usedRightColumnID"/>
+</oracle.dbtools.crest.model.design.relational.Join>

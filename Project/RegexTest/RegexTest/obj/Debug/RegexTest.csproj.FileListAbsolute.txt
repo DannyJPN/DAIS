@@ -1,0 +1,7 @@
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\RegexTest\RegexTest\bin\Debug\RegexTest.exe.config
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\RegexTest\RegexTest\bin\Debug\RegexTest.exe
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\RegexTest\RegexTest\bin\Debug\RegexTest.pdb
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\RegexTest\RegexTest\obj\Debug\RegexTest.csprojAssemblyReference.cache
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\RegexTest\RegexTest\obj\Debug\RegexTest.csproj.CoreCompileInputs.cache
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\RegexTest\RegexTest\obj\Debug\RegexTest.exe
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\RegexTest\RegexTest\obj\Debug\RegexTest.pdb

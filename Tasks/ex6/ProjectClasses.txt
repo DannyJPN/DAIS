@@ -1,0 +1,150 @@
+public class Player
+{
+	private uint ID{get;} 
+	private string Name{get;set;} 
+	private string Surname{get;set;} 
+	private DateTime Birthdate{get;set;} 
+	private uint? Phonenumber{get;set;} 
+	private string? Email{get;set;} 
+	private List<Team> Teams{get;set;} 
+
+}
+
+
+public class Team
+{
+	private uint ID{get;} 
+	private string Name{get;set;} 
+	private string SeasonOfExistence{get;set;} 
+	private Club HomeClub{get;set;} 
+	private League CompetitionClass{get;set;} 
+	private List<Player> Teams{get;set;}
+
+}
+
+
+public class Club
+{
+	private uint ID{get;} 
+	private string Name{get;set;} 
+	private string City{get;set;} 
+	private string? Address{get;set;} 
+	private uint? ManagerPhoneNumber{get;set;} 
+	private string? ManagerEmail{get;set;} 
+	private District HomeDistrict{get;set;}
+	private string? Web{get;set;}
+}
+
+
+public class Match
+{
+
+	private Player HomePlayer{get;set} 
+	private Player HostPlayer{get;set;} 
+	private string Season{get;set;} 
+	private DateTime DateOfOccurrence{get;set;} 
+	private uint HomePlayerScore{get;set;} 
+	private uint HostPlayerScore{get;set;} 
+	private League CompetitionClass{get;set;}
+
+}
+
+
+public class League
+{
+	private string ID{get;set;}
+	private string Name{get;set;}
+}
+
+
+public class District
+{
+	private string Code{get;set;}
+	private string Name{get;set;}
+	private Region HomeRegion{get;set;}
+}
+
+public class Region
+{
+	private string Code{get;set;}
+	private string Name{get;set;}
+}
+
+
+
+//--------------------------------------------------------------
+
+public class PlayerOperations
+{
+
+private const string selectstring = "select * from Hrac";
+	public string Select(Player player);
+	public string Insert(Player player);
+	public string Delete(Player player);
+	public string Update(Player player);
+	public double Bilance(Player player);
+}
+
+
+public class TeamOperations
+{
+	public string Select(Team team);
+	public string Insert(Team team);
+	public string Delete(Team team);
+	public string Update(Team team);
+	public uint Points(Team team);		
+}
+
+
+public class ClubOperations
+{
+	public string Select(Club club);
+	public string Insert(Club club);
+	public string Delete(Club club);
+	public string Update(Club club);
+	
+}
+
+
+public class MatchOperations
+{
+	public string Select(Match match);
+	public string Insert(Match match);
+	public string Delete(Match match);
+	public string Update(Match match);
+
+	
+
+}
+
+
+public class LeagueOperations
+{
+	public string Select(League league);
+	public string Insert(League league);
+	public string Delete(League league);
+	public string Update(League league);
+	
+}
+
+
+public class DistrictOperations
+{
+	public string Select(District district);
+	public string Insert(District district);
+	public string Delete(District district);
+	public string Update(District district);
+	
+}
+
+public class RegionOperations
+{
+	public string Select(Region region);
+	public string Insert(Region region);
+	public string Delete(Region region);
+	public string Update(Region region);
+	
+}
+
+
+

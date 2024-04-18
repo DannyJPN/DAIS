@@ -1,0 +1,93 @@
+Øešení úlohy 1:
+CREATE OR REPLACE PROCEDURE PrintProductAnalysis
+AS
+  v_productOrderCount INT;
+  v_tab CHAR := chr(9);
+BEGIN
+    -- iterate over all products
+    FOR v_product IN (SELECT zID, Nazev FROM Zbozi) LOOP
+      DBMS_OUTPUT.PUT_LINE(v_tab || v_product.Nazev);
+      
+      -- check whether product was ordered
+      SELECT COUNT(*) INTO v_productOrderCount FROM Polozka WHERE zID = v_product.zID;
+      
+      -- check order count for report  
+      IF (v_productOrderCount > 0) THEN
+      BEGIN
+        -- iterate over TOP 3 customers by product order count
+        FOR v_item IN (SELECT T.jmeno, T.productOrderCount 
+          FROM
+          (
+            SELECT os.jmeno, COUNT(p.Kusu) AS productOrderCount FROM Objednavka o 
+            INNER JOIN Polozka p ON p."oID" = o."oID"
+            INNER JOIN Osoba os ON os."uID" = o."uID"
+            WHERE p.zID = v_product.zID
+            GROUP BY os.jmeno
+            ORDER BY productOrderCount DESC
+          ) T
+          WHERE ROWNUM <= 3) LOOP
+
+          -- print report results
+          DBMS_OUTPUT.PUT_LINE(v_tab || v_tab || v_item.jmeno || ' ... ' || v_item.productOrderCount || 'x');
+        END LOOP;
+      END;
+      ELSE
+        DBMS_OUTPUT.PUT_LINE(v_tab || v_tab || 'Zboží nebylo objednáváno.');
+      END IF;
+    END LOOP;
+
+END;
+
+Øešení úlohy 2:
+-- add column to "Objednavka" table
+ALTER TABLE Objednavka ADD CelkovaCena INT;
+
+create or replace TRIGGER CalculateOrderTotalPrice
+BEFORE INSERT OR UPDATE OR DELETE
+ON Polozka
+FOR EACH ROW
+DECLARE
+  v_orderTotalPrice INT;
+BEGIN  
+  -- determine operation
+  CASE
+    WHEN inserting THEN
+      -- get current order total price and update
+      select NVL(CelkovaCena, 0) INTO v_orderTotalPrice FROM Objednavka WHERE "oID" = :NEW."oID";
+      UPDATE Objednavka SET CelkovaCena = v_orderTotalPrice + (:NEW.Cena * :NEW.Kusu) WHERE "oID" = :NEW."oID";
+
+    WHEN updating THEN
+      BEGIN
+        -- check whether item was assigned to different order
+        IF (:NEW."oID" != :OLD."oID") THEN
+          BEGIN
+            -- get new order total price and update
+            select NVL(CelkovaCena, 0) INTO v_orderTotalPrice FROM Objednavka WHERE "oID" = :NEW."oID";
+            UPDATE Objednavka SET CelkovaCena = v_orderTotalPrice + (:NEW.Cena * :NEW.Kusu) WHERE "oID" = :NEW."oID";
+            
+            -- get old order total price and update
+            select NVL(CelkovaCena, 0) INTO v_orderTotalPrice FROM Objednavka WHERE "oID" = :OLD."oID";
+            UPDATE Objednavka SET CelkovaCena = v_orderTotalPrice - (:OLD.Cena * :OLD.Kusu) WHERE "oID" = :OLD."oID";
+          END;
+        ELSIF(:NEW.Cena != :OLD.Cena OR :NEW.Kusu != :OLD.Kusu) THEN
+          BEGIN
+            -- item count or price was changed
+            
+            -- get new order total price and update
+            select NVL(CelkovaCena, 0) INTO v_orderTotalPrice FROM Objednavka WHERE "oID" = :NEW."oID";
+            UPDATE Objednavka SET CelkovaCena = v_orderTotalPrice - (:OLD.Cena * :OLD.Kusu - :NEW.Cena * :NEW.Kusu) WHERE "oID" = :OLD."oID";
+          END;
+        END IF;
+        
+      END;
+      
+    WHEN deleting THEN
+      -- get current order total price
+      select NVL(CelkovaCena, 0) INTO v_orderTotalPrice FROM Objednavka WHERE "oID" = :OLD."oID";
+  
+      -- update order total price change
+      UPDATE Objednavka SET CelkovaCena = v_orderTotalPrice - (:OLD.Cena * :OLD.Kusu) WHERE "oID" = :OLD."oID";
+      
+  END CASE;
+  
+END;

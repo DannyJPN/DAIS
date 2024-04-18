@@ -1,0 +1,9 @@
+C:\Users\kru0142\Desktop\Tasks\ex9\AuctionSystemORM\AuctionSystemORM\bin\Release\AuctionSystemORM.exe.config
+C:\Users\kru0142\Desktop\Tasks\ex9\AuctionSystemORM\AuctionSystemORM\bin\Release\AuctionSystemORM.exe
+C:\Users\kru0142\Desktop\Tasks\ex9\AuctionSystemORM\AuctionSystemORM\bin\Release\AuctionSystemORM.pdb
+C:\Users\kru0142\Desktop\Tasks\ex9\AuctionSystemORM\AuctionSystemORM\bin\Release\Oracle.ManagedDataAccess.dll
+C:\Users\kru0142\Desktop\Tasks\ex9\AuctionSystemORM\AuctionSystemORM\obj\Release\AuctionSystemORM.csprojAssemblyReference.cache
+C:\Users\kru0142\Desktop\Tasks\ex9\AuctionSystemORM\AuctionSystemORM\obj\Release\AuctionSystemORM.csproj.CoreCompileInputs.cache
+C:\Users\kru0142\Desktop\Tasks\ex9\AuctionSystemORM\AuctionSystemORM\obj\Release\AuctionSystemORM.csproj.CopyComplete
+C:\Users\kru0142\Desktop\Tasks\ex9\AuctionSystemORM\AuctionSystemORM\obj\Release\AuctionSystemORM.exe
+C:\Users\kru0142\Desktop\Tasks\ex9\AuctionSystemORM\AuctionSystemORM\obj\Release\AuctionSystemORM.pdb

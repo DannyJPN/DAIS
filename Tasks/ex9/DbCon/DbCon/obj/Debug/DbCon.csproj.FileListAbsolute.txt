@@ -1,0 +1,7 @@
+C:\Users\kru0142\Desktop\Tasks\ex9\DbCon\DbCon\obj\Debug\DbCon.csprojAssemblyReference.cache
+C:\Users\kru0142\Desktop\Tasks\ex9\DbCon\DbCon\obj\Debug\DbCon.csproj.CoreCompileInputs.cache
+C:\Users\kru0142\Desktop\Tasks\ex9\DbCon\DbCon\bin\Debug\DbCon.exe.config
+C:\Users\kru0142\Desktop\Tasks\ex9\DbCon\DbCon\bin\Debug\DbCon.exe
+C:\Users\kru0142\Desktop\Tasks\ex9\DbCon\DbCon\bin\Debug\DbCon.pdb
+C:\Users\kru0142\Desktop\Tasks\ex9\DbCon\DbCon\obj\Debug\DbCon.exe
+C:\Users\kru0142\Desktop\Tasks\ex9\DbCon\DbCon\obj\Debug\DbCon.pdb

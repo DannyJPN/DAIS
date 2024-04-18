@@ -1,0 +1,124 @@
+1. PRINTCOMPLAINTREPORT
+=======================================================
+
+Zadání:
+
+Vytvoøte bezparametrickou proceduru PrintComplaintReport, která pro všechny produkty vypíše prùmìrnou délku reklamací a jejich prùmìrnou cenu.  Formátovaný výstup bude vypadat následovnì:
+Complaints report
+===================================================
+|  ID  |  Oznaceni  |  Znacka  |  Delka  |  Cena  |
+pID. oznaceni, znacka, delka, cena
+
+----------------------PL/SQL---------------------------
+
+create or replace PROCEDURE PRINTCOMPLAINTREPORT AS 
+CURSOR complaint_cursor IS SELECT Produkt.pID, Produkt.oznaceni, Produkt.znacka, AVG(Reklamace.delka) AS delka, AVG(Reklamace.cena) as cena
+	FROM Produkt JOIN Nakup 
+	ON Produkt.pID = Nakup.pID JOIN Reklamace ON Nakup.nID = Reklamace.nID 
+	GROUP BY Produkt.pID, Produkt.oznaceni, Produkt.znacka
+	ORDER BY Produkt.pID;
+id Produkt.pID%TYPE;
+oznaceni Produkt.oznaceni%TYPE;
+znacka Produkt.znacka%TYPE;
+delka Reklamace.delka%TYPE;
+cena Reklamace.cena%TYPE;
+BEGIN    
+  dbms_output.put_line('Complaints report');
+  dbms_output.put_line('===================================================');
+  dbms_output.put_line('|  ID  |  Oznaceni  |  Znacka  |  Delka  |  Cena  |');
+
+  IF complaint_cursor %ISOPEN THEN
+     CLOSE complaint_cursor ;
+  END IF;
+  
+  FOR complaint IN complaint_cursor    
+  LOOP
+    dbms_output.put_line(complaint.pID || '. ' || complaint.oznaceni || ', ' || complaint.znacka || ', ' || complaint.delka || ', ' || complaint.cena);
+  END LOOP;
+
+END PRINTCOMPLAINTREPORT;
+-------------------------------------------------------
+----------------------T-SQL----------------------------
+
+CREATE PROCEDURE [test].[PrintComplaintReport]
+AS
+DECLARE complaint_cursor CURSOR FOR SELECT Produkt.pID, Produkt.oznaceni, Produkt.znacka, AVG(Reklamace.delka) AS delka, AVG(Reklamace.cena) as cena
+	FROM test.Produkt JOIN test.Nakup 
+	ON Produkt.pID = Nakup.pID JOIN test.Reklamace ON Nakup.nID = Reklamace.nID 
+	GROUP BY Produkt.pID, Produkt.oznaceni, Produkt.znacka
+	ORDER BY Produkt.pID
+DECLARE @id INT
+DECLARE @oznaceni VARCHAR(20)
+DECLARE @znacka VARCHAR(30)
+DECLARE @delka INT
+DECLARE @cena INT
+BEGIN
+	OPEN complaint_cursor
+	FETCH NEXT FROM complaint_cursor INTO @id, @oznaceni, @znacka, @delka, @cena
+	PRINT 'Complaints report'
+	PRINT '==================================================='
+	PRINT '|  ID  |  Oznaceni  |  Znacka  |  Delka  |  Cena  |'
+	WHILE @@FETCH_STATUS = 0 
+	BEGIN
+		PRINT CAST (@id AS VARCHAR(10)) + '. ' + @oznaceni + ', ' + @znacka + ', ' + CAST (@delka AS VARCHAR(10)) + ', ' + CAST (@cena AS VARCHAR(10))
+		FETCH NEXT FROM complaint_cursor INTO @id, @oznaceni, @znacka, @delka, @cena
+	END
+	CLOSE complaint_cursor
+	DEALLOCATE complaint_cursor
+END
+
+2. CREATEORDER
+=======================================================
+
+Zadání:
+
+Vytvoøte proceduru CreateOrder(pID, kusu, cena, zID, jmeno, email, pohlavi, rok_registrace, posilat_reklamu, vysledek), která v transakci pro daného zákazníka vytvoøí v tabulce Nakup objednávku. Pokud takovýto zákazník není v tabulce Zakaznik obsažen, vytvoøí rovnìž ve stejné transakci nejprve pro tohoto zákazníka v této tabulce záznam a poté pro nìj vytvoøí danou objednávku. Jako výsledek operace bude procedura vracet numerickou hodnotu 1 – operace probìhla úspìšnì, 0 – operace probìhla neúspìšnì. Tato hodnota bude pøiøazena do výstupní promìnné vysledek. Výsledek této operace bude vytisknut do konzolového výstupu. Nezapomeòte v pøípadì neúspìšné operace zavolat pøíkaz ROLLBACK.
+
+----------------------PL/SQL---------------------------
+
+create or replace PROCEDURE CREATEORDER (pID Produkt.pID%TYPE, kusu Nakup.kusu%TYPE, cena Nakup.cena%TYPE, zID Nakup.zID%TYPE, jmeno Zakaznik.jmeno%TYPE, email Zakaznik.email%TYPE, 
+	pohlavi Zakaznik.pohlavi%TYPE, rok_registrace Zakaznik.rok_registrace%TYPE, posilat_reklamu Zakaznik.posilat_reklamu%TYPE, vysledek OUT BOOLEAN)
+AS 
+nakID Nakup.nID%TYPE;
+zakID Zakaznik.zID%TYPE;
+zakCount INT;
+BEGIN
+  zakID := zID;
+  SELECT COUNT(*) INTO zakCount FROM Zakaznik WHERE zID = zakID;
+  IF zakCount = 0 THEN
+		SELECT zID INTO zakID FROM Zakaznik where rownum = 1 ORDER BY zID DESC;
+    zakID := zakID + 1;
+   INSERT INTO Zakaznik VALUES(zakID, jmeno, pohlavi, rok_registrace, posilat_reklamu, email);
+	END IF;  
+  SELECT nID INTO nakID FROM Nakup where rownum = 1 ORDER BY nID DESC;    
+	INSERT INTO Nakup VALUES(nakID + 1, zakID, pID, SYSDATE, cena, kusu);
+	vysledek := true;
+  COMMIT;
+EXCEPTION
+   WHEN OTHERS THEN
+     vysledek := false;
+     ROLLBACK;
+END CREATEORDER;
+-------------------------------------------------------
+----------------------T-SQL----------------------------
+
+CREATE PROCEDURE [test].[CreateOrder] @pID INT, @kusu INT, @cena INT, @zID INT, @jmeno VARCHAR(30), @email VARCHAR(50), 
+	@pohlavi VARCHAR(4), @rok_registrace INT, @posilat_reklamu INT, @vysledek INT OUT
+AS
+BEGIN TRY
+	BEGIN TRANSACTION
+		IF NOT EXISTS (SELECT * FROM test.Zakaznik WHERE zID = @zID)
+		BEGIN
+			SET @zID = (SELECT TOP 1 zID FROM test.Zakaznik ORDER BY zID DESC) + 1
+			INSERT INTO test.Zakaznik VALUES(@zID, @jmeno, @pohlavi, @rok_registrace, @posilat_reklamu, @email)
+		END
+		DECLARE @nakID INT 
+		SET @nakID = (SELECT TOP 1 nID FROM test.Nakup ORDER BY nID DESC) + 1
+		INSERT INTO test.Nakup VALUES(@nakID, @zID, @pID, GETDATE(), @cena, @kusu)
+		SET @vysledek = 1;
+	COMMIT TRANSACTION
+END TRY
+BEGIN CATCH	
+	SET @vysledek = 0;
+	ROLLBACK TRANSACTION
+END CATCH

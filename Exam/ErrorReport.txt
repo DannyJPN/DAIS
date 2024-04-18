@@ -1,0 +1,5 @@
+delete from Polozka where "oID" = 4 and cena >10000
+Error report -
+ORA-04091: tabulka KRU0142.POLOZKA je mìnìna, trigger/funkce ji nemusí vidìt
+ORA-06512: na "KRU0142.TOTALPRICE", line 11
+ORA-04088: chyba bìhem provádìní triggeru 'KRU0142.TOTALPRICE'

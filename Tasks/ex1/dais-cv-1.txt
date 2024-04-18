@@ -1,0 +1,12 @@
+--------------  Task 1 --------------------------
+
+alter table student add tallness int;
+alter table student modify email varchar2(40) null;
+
+--------------  Task 2 --------------------------
+
+--------------  Task 3 --------------------------
+
+Nejrozumnìjší je vložit druhý záznam se stejným primárním 
+klíèem a dát ROLLBACK pøi SET AUTOCOMMIT ON/OFF
+

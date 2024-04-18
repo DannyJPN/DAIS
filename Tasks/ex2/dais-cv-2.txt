@@ -1,0 +1,176 @@
+--------------  Task 1 --------------------------
+
+create or replace
+PROCEDURE AddStudent( 
+p_login IN VARCHAR2, 
+p_fname IN VARCHAR2, 
+p_lname IN VARCHAR2,
+p_account IN NUMBER) AS
+BEGIN
+  insert into student (login, fname, lname, tallness) values (p_login, p_fname, p_lname, p_tallness);
+END AddStudent;
+
+execute AddStudent('nov12', 'Jarda', 'Novak', 170);
+execute AddStudent('nov90', 'Lada', 'Novakova', 173);
+execute AddStudent('hla10', 'Uhor', 'Hladky', 185);
+select * from student;
+
+------------
+
+create or replace
+FUNCTION FAddStudent( 
+p_login IN VARCHAR2, 
+p_fname IN VARCHAR2, 
+p_lname IN VARCHAR2,
+p_tallness IN NUMBER) 
+RETURN VARCHAR2 AS
+BEGIN
+  insert into student (login, fname, lname, tallness) values (p_login, p_fname, p_lname, p_tallness);
+  return 'ok';
+exception
+  when others then
+    return 'error';
+END FAddStudent;
+
+set serveroutput on;
+execute dbms_output.put_line(FAddStudent('bon007', 'James', 'Bond', 190));
+execute dbms_output.put_line(FAddStudent('bac27', 'Radim', 'Baca', 175));
+
+
+--------------  Task 2 --------------------------
+
+create or replace
+PROCEDURE StudentBecomeTeacher( p_login IN student.login%TYPE, p_department IN teacher.department%TYPE)
+AS
+  v_fname student.fname%TYPE;
+  v_lname student.lname%TYPE;
+BEGIN
+  SELECT fname, lname INTO v_fname, v_lname FROM student WHERE login = p_login;
+  DELETE FROM student WHERE login = p_login;
+  INSERT INTO teacher VALUES (p_login, v_fname, v_lname, p_department, NULL);
+  commit;
+EXCEPTION
+  WHEN OTHERS THEN
+    rollback;
+END StudentBecomeTeacher;
+
+execute StudentBecomeTeacher('sob28', 100);
+
+------------
+
+create or replace
+PROCEDURE AddStudent2( 
+p_fname IN VARCHAR2, 
+p_lname IN VARCHAR2,
+p_tallness IN NUMBER) AS
+v_login VARCHAR2(5);
+BEGIN
+  v_login := substr(p_lname, 0, 3) || '00';
+  insert into student (login, fname, lname, tallness) values (v_login, p_fname, p_lname, p_tallness);
+END AddStudent2;
+
+execute AddStudent2('Bill','Gates', 166);
+
+--------------  Task 3 --------------------------
+
+alter table student add istall Int constraint isbool check (istall IN(0,1));
+
+create or replace PROCEDURE IsStudentTall( 
+p_login IN student.login%TYPE) AS
+v_avg_tallness student.tallness%TYPE;
+v_student_tallness student.tallness%TYPE;
+BEGIN
+  select avg(tallness) into v_avg_tallness from student;
+  select tallness into v_student_tallness from student where login = p_login;
+  if v_avg_tallness > v_student_tallness then
+    update student set istall = 0 where login = p_login;
+  else
+    update student set istall = 1 where login = p_login;
+  end if;
+END IsStudentTall;
+
+execute IsStudentTall('nov90');
+execute IsStudentTall('bac27');
+
+------------
+
+create or replace
+FUNCTION LoginExist( p_login IN student.login%TYPE) 
+RETURN boolean AS
+  v_login student.login%TYPE;
+BEGIN
+  select login into v_login from student where login = p_login;
+  return true;
+EXCEPTION
+  when others then
+    return false;
+END LoginExist;
+
+
+create or replace
+PROCEDURE AddStudent2( 
+p_fname IN VARCHAR2, 
+p_lname IN VARCHAR2,
+p_account IN NUMBER) AS
+  v_login VARCHAR2(10);
+  v_number INT;
+  v_code NUMBER;
+  v_errm VARCHAR2(64);
+BEGIN
+  v_number := 0;
+  loop
+    v_login := substr(p_lname, 0, 3) || TO_CHAR(v_number);
+    exit when not loginexist(v_login) or v_number > 99;
+    v_number := v_number + 1;
+  end loop;
+  insert into student (login, fname, lname, tallness) values (v_login, p_fname, p_lname, p_tallness);
+  commit;
+exception
+  when others then
+    v_code := SQLCODE;
+    v_errm := SUBSTR(SQLERRM, 1, 64);
+    DBMS_OUTPUT.PUT_LINE('Error code ' || v_code || ': ' || v_errm);
+END AddStudent2;
+
+--------------  Task 4 --------------------------
+
+create or replace
+PROCEDURE IsStudentTall
+AS
+cursor c_students is select * from student;
+v_avg_account student.account%TYPE;
+v_studentRecord student%ROWTYPE;
+BEGIN
+  select avg(account) into v_avg_account from student;
+  open c_students;
+  loop
+    fetch c_students into v_studentRecord;
+    exit when c_students%NOTFOUND;
+    if v_avg_account > v_studentRecord.account then
+      update student set isTall = 0 where login = v_studentrecord.login;
+    else
+      update student set isTall = 1 where login = v_studentrecord.login;
+    end if;
+  end loop;
+  close c_students;
+END IsStudentTall;
+
+-------
+
+create or replace
+PROCEDURE IsStudentTall
+AS
+cursor c_students is select * from student;
+v_avg_konto student.konto%TYPE;
+BEGIN
+  select avg(konto) into v_avg_konto from student;
+  for onerecord in c_students
+  loop
+    if v_avg_konto > onerecord.konto then
+      update student set isTall = 0 where login = onerecord.login;
+    else
+      update student set isTall = 1 where login = onerecord.login;
+    end if;
+  end loop;
+END IsStudentTall;
+

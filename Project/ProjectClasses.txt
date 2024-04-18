@@ -1,0 +1,340 @@
+public class Player
+{
+    
+	private uint ID{get;set;} 
+	private string Name{get;set;} 
+	private string Surname{get;set;} 
+	private DateTime Birthdate{get;set;} 
+	private uint? Phonenumber{get;set;} 
+	private string? Email{get;set;} 
+	private List<Team> Teams{get;set;} 
+     
+}
+
+
+public class Team
+{
+	private uint ID{get;set;} 
+	private string Name{get;set;} 
+	private string SeasonOfExistence{get;set;} 
+	private Club HomeClub{get;set;} 
+	private League CompetitionClass{get;set;} 
+	private List<Player> Members{get;set;}
+
+
+
+}
+
+
+public class Club
+{
+	private uint ID{get;set;} 
+	private string Name{get;set;} 
+	private string City{get;set;} 
+	private string? Address{get;set;} 
+	private uint? ManagerPhoneNumber{get;set;} 
+	private string? ManagerEmail{get;set;} 
+	private District HomeDistrict{get;set;}
+	private string? Web{get;set;}
+}
+
+
+public class Match
+{
+
+	private Player HomePlayer{get;set} 
+	private Player HostPlayer{get;set;} 
+	private string Season{get;set;} 
+	private DateTime DateOfOccurrence{get;set;} 
+	private uint HomePlayerScore{get;set;} 
+	private uint HostPlayerScore{get;set;} 
+	private League CompetitionClass{get;set;}
+
+}
+
+
+public class League
+{
+	private string ID{get;set;}
+	private string Name{get;set;}
+}
+
+
+public class District
+{
+	private string Code{get;set;}
+	private string Name{get;set;}
+	private Region HomeRegion{get;set;}
+}
+
+public class Region
+{
+	private string Code{get;set;}
+	private string Name{get;set;}
+}
+
+
+
+//--------------------------------------------------------------
+
+public static class PlayerOperations
+{
+
+
+    private static string singleselectstring= "select h.ID,h.Prijmeni,h.Jmeno,h.datum_narozeni,h.telefon,h.email from Hrac h "+
+    "where h.ID = @playerID ;
+    
+    private static string insertstring "insert into Hrac (Prijmeni,jmeno,datum_narozeni,telefon,email) values (@surname,@name,@birthdate,@phone,@mail)";
+    private static string deletestring= "delete from Hrac where id = @playerID";
+    private static string updatestring ="update Hrac set prijmeni = @surname,jmeno=@name,datum_narozeni=@birthdate,telefon=@phone,email=@mail where ID = @playerID"; 
+  
+    private static string selectstring = "select h.ID,h.Prijmeni,h.Jmeno,h.datum_narozeni from Hrac "+
+    "where h.prijmeni like %@surname% or h.jmeno like %@name%" ;
+    
+    private static string findteamsstring = "select d.ID,d.nazev,d.ID_oddilu,d.ID_ligy from Druzstvo d +"
+    "join hrac_druzstvo hd on hd.ID_druzstva = d.ID "+
+    "where d.sezona = @season and hd.ID_hrace = @playerID" ;
+    
+    private static string findclubstring = "select o.nazev from Oddil o "+
+    "where o.ID_oddilu in (  select d.ID_oddilu from Druzstvo d join hrac_druzstvo hd on hd.ID_druzstva = d.ID  where d.sezona = @season and hd.ID_hrace = @playerID  )";
+    
+  public static void CommandFill(Player player,SqlCommand command);
+	public static Player Select(int ID)
+    {
+            Database db = new Database();
+            db.Connect();
+            SqlCommand command = db.CreateCommand(singleselectstring);
+
+            command.Parameters.AddWithValue("@playerID", ID);
+            SqlDataReader reader = db.Select(command);
+
+            Collection<Player> players = LoadData(reader);
+            Player player = null;
+            if (players.Count == 1)
+            {
+                player = players[0];
+            }
+            reader.Close();
+            db.Close();
+            return player;
+    
+    
+    }
+    public static Collection<Player> Select(string surname,string name);                 
+	public static int Insert(Player player);
+	public static int Delete(Player player);
+	public static int Update(Player player);
+	public static double Bilance(Player player);
+    
+    public static string FindTeams(Player player,string season);
+    public static string FindClub(Player player,string season) ;
+
+    public static Collection<Player> LoadData(SqlDataReader reader)
+    {
+      Collection<Player> players = new Collection<Player>();
+      
+      while(reader.Read())
+      {
+      Player p = new Player();
+      p.ID = Convert.ToInt32(reader["ID"]);
+	    p.Name = Convert.ToString(reader["jmeno"]);
+	    p.Surname = Convert.ToString(reader["prijmeni"]);
+      p.Birthdate = Convert.ToDateTime(reader["datum_narozeni]);
+	    p.Phonenumber = reader.IsDBNull(reader.GetOrdinal("telefon"))?null:Convert.ToInt32(reader["telefon"]) ;
+	    p.Email      =reader.IsDBNull(reader.GetOrdinal("email"))?null:Convert.ToString(reader["email"]) ;
+      players.Add( p   );
+        
+        
+        
+        
+      }
+      return players;
+    
+    }
+
+}
+
+
+
+public static class TeamOperations
+{
+    
+    private static string singleselectstring= "select d.ID,d.nazev,d.sezona,d.ID_oddilu,d.ID_ligy from Druzstvo "+
+    "where d.ID = @teamID";
+    
+    private static string insertstring "insert into Druzstvo (nazev,sezona,ID_oddilu,ID_ligy) values (@name,@season,@clubID,@leagueID)";
+    private static string deletestring= "delete from Druzstvo where id = @teamID";
+    private static string updatestring ="update Druzstvo set nazev=@name,sezona=@season,ID_oddilu=@clubID,ID_ligy=@leagueID where ID = @teamID"; 
+  
+    private static string selectstring = "select d.ID,d.nazev,d.ID_oddilu,d.ID_ligy from Druzstvo "+
+    "where d.nazev like %@name%";
+    
+    private static string findmembersstring = "select h.ID,h.Prijmeni,h.Jmeno,h.datum_narozeni,h.telefon,h.email from Hrac h "+
+    "join hrac_druzstvo hd on hd.ID_hrace = h.ID "+
+    "where hd.ID_druzstva = @teamID";
+    
+    
+    public static void CommandFill(Team team,SqlCommand command);
+	 public static Team Select(int ID)
+    {
+            Database db = new Database();
+            db.Connect();
+            SqlCommand command = db.CreateCommand(singleselectstring);
+
+            command.Parameters.AddWithValue("@teamID", ID);
+            SqlDataReader reader = db.Select(command);
+
+            Collection<Team> teams = LoadData(reader);
+            Team team = null;
+            if (teams.Count == 1)
+            {
+                team = teams[0];
+            }
+            reader.Close();
+            db.Close();
+            return team;
+    
+    }
+    public static Collection <Team> (string name);
+	  public static int Insert(Team team);
+	  public static int Delete(Team team);
+	  public static int Update(Team team);
+	  public static uint Points(Team team);		
+    public static string FindMembers(Team team);
+    public static Collection<Team> LoadData(SqlDataReader reader)
+    {
+         Collection<Team> teams = new Collection<Team>();
+      
+      while(reader.Read())
+      {
+      Team t = new Team();
+      t.ID = Convert.ToInt32(reader["ID"]);
+	    t.Name = Convert.ToString(reader["nazev"]);
+	    t.League = LeagueOperations.Select(reader["ID_ligy"]);
+      t.Club = ClubOperations.Select(reader["ID_oddilu"]);
+	    
+      teams.Add( t   );
+        
+        
+        
+        
+      }
+      return teams;
+    }
+    
+
+}
+
+
+public static class ClubOperations
+{
+
+    private static string singleselectstring= "select o.ID,o.nazev,o.adresa,o.mesto,o.web,o.okres_zkratka,o.telefon_jednatele,o.email_jednatele from Oddil "+
+    "where o.ID = @clubID";
+    
+    private static string insertstring "insert into Oddil (nazev,adresa,mesto,web,okres_zkratka,telefon_jednatele,email_jednatele) values (@name,@address,@city,@web,@district_abbreviation,@manager_phone,@manager_email)";
+    private static string deletestring= "delete from Druzstvo where id = @clubID";
+    private static string updatestring ="update Druzstvo set nazev=@name,adresa=@address,mesto=@city,web=@web,okres_zkratka=@district_abbreviation,telefon_jednatele=@manager_phone,email_jednatele=@manager_email where ID = @clubID"; 
+  
+    private static string selectstring = "select o.ID,o.nazev,o.adresa,o.mesto,o.web,o.okres_zkratka,o.telefon_jednatele,o.email_jednatele from Oddil "+
+    "where o.nazev like %@name%";
+    
+    private static string findteamsstring = "select d.ID,d.nazev,d.sezona,d.ID_oddilu,d.ID_ligy from Druzstvo where d.ID_oddilu = @clubID"
+
+   
+
+  public static void CommandFill(Club club,SqlCommand command);
+	public static Club Select(int ID)
+  {
+        Database db = new Database();
+            db.Connect();
+            SqlCommand command = db.CreateCommand(singleselectstring);
+
+            command.Parameters.AddWithValue("@clubID", ID);
+            SqlDataReader reader = db.Select(command);
+
+            Collection<Club> clubs = LoadData(reader);
+            Club club = null;
+            if (clubs.Count == 1)
+            {
+                club = clubs[0];
+            }
+            reader.Close();
+            db.Close();
+            return club;
+  
+  
+  
+  }
+    public static Collection<Club>(string name);
+	public static int Insert(Club club);
+	public static int Delete(Club club);
+	public static int Update(Club club);
+    public static Collection<Team> FindTeams(Club club,string season);
+    public static Collection<Player> FindMembers(Club club,string season);
+   
+    public static Collection<Club> LoadData(SqlDataReader reader)
+    {
+         Collection<Club> clubs = new Collection<Club>();
+      
+      while(reader.Read())
+      {
+      Club c = new Club();
+      c.ID = Convert.ToInt32(reader["ID"]);
+	    c.Name = Convert.ToString(reader["nazev"]);
+	    c.Web = reader.IsDBNull(reader.GetOrdinal("web"))?null:Convert.ToString(reader["web"]) ;
+      c.Address =  reader.IsDBNull(reader.GetOrdinal("adresa"))?null:Convert.ToString(reader["adresa"]) ;
+      c.City  =Convert.ToString(reader["mesto"]) ;
+      c.HomeDistrict =  DistrictOperations(reader["okres_zkratka"]);
+      c.ManagerPhoneNumber=reader.IsDBNull(reader.GetOrdinal("telefon_jednatele"))?null:Convert.ToInt32(reader["telefon_jednatele"]) ;
+      c.ManagerEmail     =reader.IsDBNull(reader.GetOrdinal("email_jednatele"))?null:Convert.ToString(reader["email_jednatele"]) ;
+	    
+      clubs.Add( c   );
+        
+        
+        
+        
+      }
+      return clubs;
+    }
+    
+	
+}
+
+
+public static class MatchOperations
+{
+      
+    
+    
+    private static string insertstring "insert into Zapas (ID_domaciho_hrace,ID_hostujiciho_hrace,skore_domaciho,skore_hostujiciho,datum,ID_ligy,sezona) values (@homeplayerID,@hostplayerID,@homescore,@hostscore,@date,@league,@season)";
+    private static string deletestring= "delete from Zapas where ID_domaciho_hrace = @homeplayerID and ID_hostujiciho_hrace = @hostplayerID and ID_ligy,=@league and sezona=@season";
+    private static string updatestring ="update Zapas set ID_domaciho_hrace=@homeplayerID,ID_hostujiciho_hrace=@hostplayerID,skore_domaciho=@homescore,skore_hostujiciho=@hostscore,datum=@date,ID_ligy=@league,sezona=@season "+
+    " where ID_domaciho_hrace = @homeplayerID and ID_hostujiciho_hrace = @hostplayerID and ID_ligy,=@league and sezona=@season"; 
+  
+    private static string selectstring ="select * from " 
+    "(select z.ID_domaciho_hrace,z.ID_hostujiciho_hrace,z.skore_domaciho,z.skore_hostujiciho,z.datum,z.ID_ligy,z.sezona from Zapas z "+
+    "where z.ID_domaciho_hrace = @searched_player_ID and z.sezona = @season and z.ID_ligy = @league "+
+    "union "+
+    "(select z.ID_hostujiciho_hrace,z.ID_domaciho_hrace,z.skore_hostujiciho,z.skore_domaciho,z.datum,z.ID_ligy,z.sezona from Zapas z "+
+    "where z.ID_hostujiciho_hrace = @searched_player_ID and z.sezona = @season and z.ID_ligy = @league ))t order by t.datum";
+
+
+  
+  
+  
+  
+    public static void CommandFill(Match match,SqlCommand command);
+	public static Match Select(int homeplayerID,int hostplayerID,string season,string league);
+    public static Collection<Match> Select(int searchedplayerID,string season,string league) ;
+	public static int Insert(Match match);
+	public static int Delete(Match match);
+	public static int Update(Match match);
+
+	
+
+}
+
+
+
+

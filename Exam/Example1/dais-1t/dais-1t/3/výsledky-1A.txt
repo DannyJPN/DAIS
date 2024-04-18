@@ -1,0 +1,38 @@
+======================================1=====================================
+CREATE OR REPLACE PROCEDURE PRINTBRANCHOFFICESTATISTICS(obYear IN INT)
+AS
+CURSOR cu IS SELECT pobocka.pId, SUM(polozka.cena * polozka.kusu) AS cena, ROUND(AVG(polozka.cena * polozka.kusu), 2) AS prum_cena, SUM(polozka.kusu) AS ks, ROUND(AVG(polozka.kusu), 2) AS avg_ks
+FROM pobocka 
+JOIN zamestnanec ON pobocka.pId = zamestnanec.pId 
+JOIN objednavka ON objednavka.zaId = zamestnanec.zaId 
+JOIN polozka ON polozka."oID" = objednavka."oID"
+GROUP BY pobocka.pId, EXTRACT(YEAR FROM objednavka.vytvorena) 
+HAVING EXTRACT(YEAR FROM objednavka.vytvorena) = obYear;
+entNum INT := 0;
+BEGIN
+  DBMS_OUTPUT.PUT_LINE('pId | sumPrice (kè) | avgPrice (kè) | sumPieces (ks) | avgPieces (ks)');
+  DBMS_OUTPUT.PUT_LINE('=====================================================================');
+  FOR one_pobocka IN cu LOOP
+    entNum := entNum + 1;
+    DBMS_OUTPUT.PUT_LINE(one_pobocka.pId || ' | ' || one_pobocka.cena || ' | ' || one_pobocka.prum_cena || ' | ' || one_pobocka.ks || ' | ' || one_pobocka.avg_ks);
+  END LOOP;
+  DBMS_OUTPUT.PUT_LINE('=====================================================================');
+  DBMS_OUTPUT.PUT_LINE('Final number of entries: ' || entNum);
+  DBMS_OUTPUT.PUT_LINE('=====================================================================');
+END PRINTBRANCHOFFICESTATISTICS;
+
+======================================2=====================================
+CREATE OR REPLACE TRIGGER UPDATECOMMODITYTRIGGER 
+BEFORE UPDATE ON ZBOZI
+FOR EACH ROW
+DECLARE
+ex_validation EXCEPTION;
+BEGIN
+  IF :NEW.aktualni_cena < 0 OR :NEW.rok_vyroby > EXTRACT(YEAR FROM sysdate) THEN
+    RAISE ex_validation;
+  END IF;
+  IF(:NEW.aktualni_cena IS NOT NULL) THEN
+    UPDATE polozka SET cena = :NEW.aktualni_cena WHERE polozka.zId = :NEW.zId AND polozka."oID" IN (SELECT objednavka."oID" FROM objednavka WHERE objednavka.potvrzena IS NULL);
+  END IF;
+  INSERT INTO zboziHistorie VALUES (:OLD.zId, :OLD.aktualni_cena, :OLD.rok_vyroby, :OLD.kategorie, :OLD.nazev);
+END;

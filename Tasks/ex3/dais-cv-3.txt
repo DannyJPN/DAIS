@@ -1,0 +1,285 @@
+--------------  Task 1 --------------------------
+
+create or replace
+TRIGGER OperationCount
+BEFORE DELETE OR INSERT OR UPDATE ON Student
+FOR EACH ROW
+DECLARE
+BEGIN
+  case
+    when inserting then
+      update statistics set operationcount = operationcount + 1 where operation = 'insert';
+    when updating then
+      update statistics set operationcount = operationcount + 1 where operation = 'update';
+    when deleting then
+      update statistics set operationcount = operationcount + 1 where operation = 'delete';
+  end case;
+END;
+/
+
+---------
+
+alter table course add capacity int;
+update course set capacity = 2;
+
+create or replace
+trigger capacityControl
+BEFORE INSERT ON student_course
+for each row
+declare
+  v_capacity int;
+  v_student_number int;
+begin
+  select capacity into v_capacity from course where id = :NEW.idcourse;
+  select count(*) into v_student_number from student_course where idcourse = :NEW.idcourse;
+  if v_capacity < v_student_number + 1 then
+    dbms_output.put_line('Number of students exceeded the capacity of lecture');
+  end if;
+end;
+/
+
+---------
+
+create or replace
+trigger capacityControl
+BEFORE INSERT ON student_course
+for each row
+declare
+  v_capacity int;
+  v_student_number int;
+  capacity_exceeded exception;
+begin
+  select capacity into v_capacity from course where id = :NEW.idcourse;
+  select count(*) into v_student_number from student_course where idcourse = :NEW.idcourse;
+  if v_capacity < v_student_number + 1 then
+    --dbms_output.put_line('Number of students exceeded the capacity of lecture');
+    raise capacity_exceeded;
+  end if;
+end;
+/
+
+set serveroutput on;
+set autocommit off;
+
+begin
+  insert into student_course values ('Bon3', 1, TO_DATE('1.1.2009','DD.MM.YYYY'));
+  commit;
+exception
+  when others then
+    dbms_output.put_line('Capacita prekrocena');
+    rollback;
+end;
+/
+
+--------------  Task 2 --------------------------
+
+create or replace
+PROCEDURE CopyTableStructure(p_table_name VARCHAR2) as
+  cursor c_columns is select * from user_tab_columns where table_name = p_table_name order by column_id;
+  v_command VARCHAR2(1000);
+begin
+  v_command := 'CREATE TABLE ' || p_table_name || '_old (';
+  for one_column in c_columns loop
+    if c_columns%ROWCOUNT > 1 then
+      v_command := v_command || ',';
+    end if;
+      v_command := v_command || ' ' || one_column.column_name || ' ' || one_column.data_type || '(' || one_column.data_length || ')';
+  end loop;
+  v_command := v_command || ')';  
+  
+  EXECUTE IMMEDIATE v_command;
+end;
+
+-----------
+
+create or replace
+PROCEDURE CopyTable(p_table_name VARCHAR2) as
+begin
+  copytablestructure(p_table_name);
+  execute immediate 'declare cursor c_rows is select * from ' || p_table_name || '; ' || 
+  'begin ' ||
+    'for one_row in c_rows loop ' || 
+      'insert into ' || p_table_name || '_old values one_row;' ||
+    'end loop; end;';
+end;
+
+------------------------ Task 3a -----------------------------------------------
+-- Lehka uprava 
+
+-- 570.53s
+DECLARE
+  TYPE rc IS REF CURSOR;
+  v_rc rc;
+  v_dummy ALL_OBJECTS.OBJECT_NAME%type;
+  v_start NUMBER DEFAULT DBMS_UTILITY.GET_TIME;
+BEGIN
+  FOR i IN 1 .. 10000
+  LOOP
+    OPEN v_rc FOR 
+      'select object_name from all_objects
+         where object_id = ' || i;
+    FETCH v_rc INTO v_dummy;
+    -- DBMS_OUTPUT.PUT_LINE(i || ': ' || v_dummy);
+    CLOSE v_rc;
+  END LOOP;
+  DBMS_OUTPUT.PUT_LINE(round((DBMS_UTILITY.GET_TIME-v_start)/100, 2) || ' s' );
+END;
+/
+
+-------------------------------------------------------------------------------
+
+-- 1.62s
+DECLARE
+  TYPE rc IS REF CURSOR;
+  v_rc rc;
+  v_dummy ALL_OBJECTS.OBJECT_NAME%type;
+  v_start NUMBER DEFAULT DBMS_UTILITY.GET_TIME;
+BEGIN
+  FOR i IN 1 .. 10000
+  LOOP
+    OPEN v_rc FOR
+      'select object_name from all_objects
+         where object_id = :x' USING i;
+    FETCH v_rc INTO v_dummy;
+    CLOSE v_rc;
+    -- DBMS_OUTPUT.PUT_LINE(i || ': ' || v_dummy);
+  END LOOP;
+  DBMS_OUTPUT.PUT_LINE(round((DBMS_UTILITY.GET_TIME-v_start)/100, 2) || ' s' );
+END;
+/
+
+------------------------ Task 3b -----------------------------------------------
+
+CREATE TABLE Usertab(
+  ID NUMBER PRIMARY KEY,
+  fname VARCHAR(50) NOT NULL,
+  lname VARCHAR(50) NOT NULL)
+  
+-------------------------------------------------------------------------------
+-- 34,88 s
+DECLARE
+  v_fname Usertab.fname%TYPE;
+  v_lname Usertab.lname%TYPE;
+  v_str VARCHAR(100);
+  v_start NUMBER DEFAULT DBMS_UTILITY.GET_TIME;
+BEGIN
+  FOR i IN 1 .. 100000
+  LOOP
+    v_fname := 'fname' || i;
+    v_lname := 'lname' || i;
+    v_str := 'INSERT INTO Usertab VALUES(' || i || ',''' || v_fname || ''',''' || v_lname || ''')';
+    EXECUTE IMMEDIATE v_str;
+    -- DBMS_OUTPUT.PUT_LINE(v_str);
+  END LOOP;
+  DBMS_OUTPUT.PUT_LINE(round((DBMS_UTILITY.GET_TIME-v_start)/100, 2) || ' s' );
+END;
+/
+
+-------------------------------------------------------------------------------
+-- 5,07 s 
+DECLARE
+  v_fname Usertab.fname%TYPE;
+  v_lname Usertab.lname%TYPE;
+  v_str VARCHAR(100);
+  v_start NUMBER DEFAULT DBMS_UTILITY.GET_TIME;
+BEGIN
+  FOR i IN 1 .. 100000
+  LOOP
+    v_fname := 'fname' || i;
+    v_lname := 'lname' || i;
+    v_str := 'INSERT INTO Usertab VALUES(:1,:2,:3)';
+    EXECUTE IMMEDIATE v_str USING i,v_fname,v_lname;
+    -- DBMS_OUTPUT.PUT_LINE(v_str);
+  END LOOP;
+  DBMS_OUTPUT.PUT_LINE(round((DBMS_UTILITY.GET_TIME-v_start)/100, 2) || ' s' );
+END;
+/
+
+-------------------------- Task 3c ---------------------------------------------
+
+-- COMMIT po každém záznamu: 13.45s
+-- COMMIT po posledním záznamu: 5.7s
+
+--------------  Task 4 --------------------------
+
+create or replace
+FUNCTION LoginExist( p_login IN student.login%TYPE) 
+RETURN boolean AS
+  v_login student.login%TYPE;
+BEGIN
+  select login into v_login from student where login = p_login;
+  return true;
+EXCEPTION
+  when no_data_found then
+    return false;
+END LoginExist;
+/
+
+-------
+
+create or replace FUNCTION 
+InsertStudent( 
+  p_login IN student.login%TYPE, 
+  p_fname IN student.fname%TYPE, 
+  p_lname IN student.lname%TYPE, 
+  p_account IN student.account%TYPE) 
+RETURN boolean AS
+BEGIN
+  Insert Into student(login, fname, lname, account) Values (p_login, p_fname, p_lname, p_account);
+  return true;
+EXCEPTION
+  when DUP_VAL_ON_INDEX then
+    return false;
+END InsertStudent;
+/
+
+create or replace
+PROCEDURE AddStudent3( 
+p_fname IN VARCHAR2, 
+p_lname IN VARCHAR2,
+p_account IN NUMBER) AS
+  v_login VARCHAR2(10);
+  v_number INT;
+  v_code NUMBER;
+  v_errm VARCHAR2(64);
+BEGIN
+  v_number := 0;
+  loop
+    v_login := substr(p_lname, 0, 3) || TO_CHAR(v_number);
+    exit when insertstudent(v_login, p_fname, p_lname, p_account) or v_number > 99;
+    v_number := v_number + 1;
+  end loop;
+  commit;
+exception
+  when others then
+    v_code := SQLCODE;
+    v_errm := SUBSTR(SQLERRM, 1, 64);
+    DBMS_OUTPUT.PUT_LINE('Error code ' || v_code || ': ' || v_errm);
+    rollback;
+END AddStudent3;
+/
+
+--------
+
+create or replace
+PROCEDURE StudentBecomeTeacher( 
+  p_login IN CHAR, 
+  p_department IN INTEGER)
+AS
+  v_fname VARCHAR2(20);
+  v_lname VARCHAR2(20);
+  e_no_delete exception;
+pragma exception_init (e_no_delete,-02292);
+BEGIN
+  SELECT fname, lname INTO v_fname, v_lname FROM student WHERE login = p_login;
+  DELETE FROM student WHERE login = p_login;
+  INSERT INTO teacher(login, fname, lname, department) VALUES (p_login, v_fname, v_lname, p_department);
+EXCEPTION
+  WHEN e_no_delete THEN
+    delete from student_course where idstudent = p_login;
+    StudentBecomeTeacher(p_login, p_department);
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.put_line (DBMS_UTILITY.FORMAT_ERROR_STACK);
+END StudentBecomeTeacher;
+/
+

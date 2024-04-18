@@ -1,0 +1,130 @@
+Øešení úlohy 1:
+CREATE PROCEDURE PrintProductAnalysis
+AS
+BEGIN
+	DECLARE @v_tab CHAR = CHAR(9);
+	DECLARE @v_productId INT;
+	DECLARE @v_productName nvarchar(max);
+	DECLARE @v_customerName nvarchar(max);
+	DECLARE @v_orderCount INT;
+
+	-- declare products cursor
+	DECLARE c_products CURSOR FOR SELECT zID, Nazev from Zbozi;
+
+	-- iterate over all products
+	OPEN c_products;
+	FETCH NEXT FROM c_products INTO @v_productId, @v_productName;
+  
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		print @v_tab + @v_productName;
+  
+		-- check whether product was ordered
+		IF EXISTS(SELECT 1 FROM Polozka p WHERE p.zID = @v_productId)
+			BEGIN
+				-- declare customers cursor
+				DECLARE c_customers CURSOR FOR SELECT TOP 3 os.jmeno, COUNT(p.Kusu) AS orderCount FROM Objednavka o 
+				INNER JOIN Polozka p ON p.oID = o.oID
+				INNER JOIN Osoba os ON os.uID = o.uID
+				WHERE p.zID = @v_productId
+				GROUP BY os.jmeno
+				ORDER BY orderCount DESC
+
+				-- iterate over TOP 3 customers by order count
+				OPEN c_customers;
+				FETCH NEXT FROM c_customers INTO @v_customerName, @v_orderCount;
+  
+				WHILE @@FETCH_STATUS = 0
+				BEGIN
+					print @v_tab + @v_tab + @v_customerName + ' ... ' + CAST(@v_orderCount as nvarchar) + 'x';
+
+					-- fetch next customer
+					FETCH NEXT FROM c_customers INTO @v_customerName, @v_orderCount;
+				END
+
+				CLOSE c_customers;
+				DEALLOCATE c_customers;
+
+			END
+		ELSE
+			print @v_tab + @v_tab + 'Zboží nebylo objednáváno.';
+
+		-- fetch next product
+		FETCH NEXT FROM c_products INTO @v_productId, @v_productName;
+	END
+  
+	CLOSE c_products;
+	DEALLOCATE c_products;
+
+END
+
+
+Øešení úlohy 2:
+-- add column to "Objednavka" table
+ALTER TABLE Objednavka ADD CelkovaCena INT;
+
+
+CREATE TRIGGER CalculateOrderTotalPrice
+ON Polozka
+FOR INSERT, UPDATE, DELETE
+AS
+  -- determine operation
+  IF EXISTS (SELECT 1 FROM inserted)
+	BEGIN
+		IF EXISTS (SELECT 1 FROM deleted)
+		  BEGIN
+			-- I am an update
+			DECLARE @v_newOrderId INT;
+			DECLARE @v_newItemPrice INT;
+			DECLARE @v_newItemCount INT;
+			DECLARE @v_oldOrderId INT;
+			DECLARE @v_oldItemPrice INT;
+			DECLARE @v_oldItemCount INT;
+
+			-- get new values
+			select @v_newOrderId = oID, @v_newItemCount = Kusu, @v_newItemPrice = Cena from Inserted;
+
+			-- get old values
+			select @v_oldOrderId = oID, @v_oldItemCount = Kusu, @v_oldItemPrice = Cena from Deleted;
+
+			IF(@v_newOrderId != @v_oldOrderId)
+				BEGIN
+					-- get new order total price and update
+					UPDATE o SET o.CelkovaCena = ISNULL(o.CelkovaCena, 0) + (i.Cena * i.Kusu) FROM Objednavka as o 
+						INNER JOIN Inserted i ON i.oID = o.oID
+						WHERE o.oID = i.oID;
+
+					-- get old order total price and update
+					UPDATE o SET o.CelkovaCena = ISNULL(o.CelkovaCena, 0) - (d.Cena * d.Kusu) FROM Objednavka as o 
+						INNER JOIN Deleted d ON d.oID = o.oID
+						WHERE o.oID = d.oID;
+				END
+			ELSE IF(@v_newItemPrice != @v_oldItemPrice OR @v_newItemCount != @v_oldItemCount)
+				BEGIN
+					-- get order total price and update
+					UPDATE o SET o.CelkovaCena = ISNULL(o.CelkovaCena, 0) - (d.Cena * d.Kusu - i.Cena * i.Kusu) FROM Objednavka as o 
+						INNER JOIN Inserted i ON i.oID = o.oID
+						INNER JOIN Deleted d ON d.oID = o.oID
+						WHERE o.oID = i.oID;
+					
+				END
+			
+		  END
+		ELSE
+		BEGIN
+			-- I am an insert
+			-- get current order total price and update
+			UPDATE o SET o.CelkovaCena = ISNULL(o.CelkovaCena, 0) + (i.Cena * i.Kusu) FROM Objednavka as o 
+				INNER JOIN Inserted i ON i.oID = o.oID
+				WHERE o.oID = i.oID;
+		END
+	END
+  ELSE
+	BEGIN
+		-- I am a delete
+		-- get current order total price and update
+		UPDATE o SET o.CelkovaCena = ISNULL(o.CelkovaCena, 0) - (d.Cena * d.Kusu) FROM Objednavka as o 
+			INNER JOIN Deleted d ON d.oID = o.oID
+			WHERE o.oID = d.oID;
+
+	END

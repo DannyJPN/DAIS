@@ -1,0 +1,28 @@
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\bin\Debug\UserControlTest.exe.config
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\bin\Debug\UserControlTest.exe
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\bin\Debug\UserControlTest.pdb
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.csprojAssemblyReference.cache
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.DetailControl.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.GridControl.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.PlayerDetailControl.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.Properties.Resources.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.csproj.GenerateResource.cache
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.csproj.CoreCompileInputs.cache
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.exe
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.pdb
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.Form1.resources
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.TeamDetailControl.resources
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\bin\Debug\UserControlTest.exe.config
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\bin\Debug\UserControlTest.exe
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\bin\Debug\UserControlTest.pdb
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.csprojAssemblyReference.cache
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.DetailControl.resources
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.Form1.resources
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.GridControl.resources
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.PlayerDetailControl.resources
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.Properties.Resources.resources
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.TeamDetailControl.resources
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.csproj.GenerateResource.cache
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.csproj.CoreCompileInputs.cache
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.exe
+C:\Users\Dan\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\UserControlTest\UserControlTest\obj\Debug\UserControlTest.pdb

@@ -1,0 +1,197 @@
+/*
+ * DAIS 2013/2014
+ * cv-3_task-1_1.sql
+ */
+CREATE OR REPLACE PROCEDURE SkoreKolo(p_nazevLiga Liga.nazev%TYPE, p_nazevRocnik Rocnik.nazev%TYPE, p_poradiKola Zapas.poradi_kola%TYPE)
+AS
+  v_idLiga Liga.idLiga%TYPE;
+  v_idRocnik Rocnik.idRocnik%TYPE;
+  v_sumSkoreDomaci NUMBER;
+  v_sumSkoreHoste NUMBER;
+BEGIN
+  SELECT idLiga INTO v_idLiga FROM Liga WHERE nazev = p_nazevLiga;
+  SELECT idRocnik INTO v_idRocnik FROM Rocnik WHERE idLiga = v_idLiga AND nazev = p_nazevRocnik;
+  
+  SELECT SUM(skore_domaci), SUM(skore_hoste) INTO v_sumSkoreDomaci, v_sumSkoreHoste  FROM Zapas WHERE idRocnik = v_idRocnik AND poradi_kola = p_poradiKola;
+  INSERT INTO SkoreKoloTab(idLiga, idRocnik, poradi_kola, skore_domaci, skore_hoste) VALUES(v_idLiga, v_idRocnik, p_poradiKola, v_sumSkoreDomaci, v_sumSkoreHoste);
+  
+  DBMS_OUTPUT.PUT_LINE(v_idLiga || ', ' || v_idRocnik || ', ' || p_poradiKola || ': ' || v_sumSkoreDomaci || ':' || v_sumSkoreHoste);
+END;
+
+EXECUTE SkoreKolo('Extraliga ledního hokeje', '2012/2013', 52);
+
+SELECT * FROM SkoreKoloTab;
+
+CREATE TABLE SkoreKoloTab(
+  idLiga NUMBER,
+  idRocnik NUMBER,
+  poradi_kola NUMBER,
+  skore_domaci NUMBER NOT NULL,
+  skore_hoste NUMBER NOT NULL,
+  PRIMARY KEY(idLiga, idRocnik, poradi_kola));
+  
+DROP TABLE SkoreKoloTab;
+
+/*
+ * DAIS 2013/2014
+ * cv-3_task-1_2.sql
+ */
+CREATE OR REPLACE TRIGGER aktualizujBodyHrace BEFORE INSERT ON Bodovani
+  FOR EACH ROW
+BEGIN
+  /* Uloha je jednoducha, zadani by mohlo byt obohaceno o kontrolu
+     zda hrac je hracem daneho tymu apod. */
+  UPDATE Hrac SET body = body + 1 WHERE idHrac = :NEW.idHrac;
+END;
+
+DROP TRIGGER aktualizujBodyHrace;
+
+DECLARE
+  v_idZapas Zapas.idZapas%TYPE;
+BEGIN
+  SELECT idZapas INTO v_idZapas FROM Zapas WHERE  poradi_kola=52 AND domaci=13 AND hoste=9;
+  INSERT INTO Bodovani VALUES(v_idZapas, 4, 'a');
+  DBMS_OUTPUT.PUT_LINE(v_idZapas);
+END;  
+
+SELECT * FROM Hrac WHERE idHrac=4;
+SELECT * FROM Bodovani WHERE idZapas=5 AND idHrac=4;
+
+/*
+ * DAIS 2013/2014
+ * cv-3_task-2_1.sql
+ */
+CREATE OR REPLACE PROCEDURE PrintNejlepsiHraci(
+  p_idRocnik ROCNIK.IDROCNIK%TYPE, 
+  p_idTym TYM.IDTYM%TYPE)
+AS
+  v_nazevLigy LIGA.NAZEV%TYPE;
+  v_nazevRocniku ROCNIK.NAZEV%TYPE;
+  v_nazevTymu TYM.NAZEV%TYPE;
+  
+	type array_t is varray(4) of varchar2(2);
+	array array_t := array_t('l', 'p', 'c', 'd');  
+  v_post varchar(15);
+BEGIN
+  SELECT l.nazev, r.NAZEV
+    into v_nazevLigy, v_nazevRocniku
+    from liga l
+    join rocnik r on l.IDLIGA = r.IDLIGA
+    where r.IDROCNIK = p_idRocnik;
+  
+  select t.NAZEV into v_nazevTymu from tym t where t.IDTYM = p_idTym;
+  DBMS_OUTPUT.PUT_LINE(v_nazevLigy || ', ' || v_nazevRocniku || ', ' || v_nazevTymu);
+
+  for i in 1..array.count 
+  loop  
+    for jeden_hrac in (
+      select h.JMENO hrac_jmeno, count(*) maxGoals      
+        from tym t
+        join zapas z on t.IDTYM = z.DOMACI or t.idtym = z.hoste
+        join bodovani b on z.idZapas =  b.IDZAPAS
+        join hrac h on b.idHrac = h.IDHRAC
+        where h.post = array(i) and t.IDTYM = p_idTym  and b.typ = 'g'
+        group by h.JMENO
+        having count(*) >= all
+        (
+          select count(*)
+          from tym t
+          join zapas z on t.IDTYM = z.DOMACI or t.idtym = z.hoste
+          join bodovani b on z.idZapas =  b.IDZAPAS
+          join hrac h on b.idHrac = h.IDHRAC
+          where h.post = array(i) and t.IDTYM = p_idTym  and b.typ = 'g'
+          group by h.JMENO
+        )
+      )
+      LOOP
+        CASE array(i)
+          When 'l' THEN v_post := 'Leve kridlo';
+          When 'p' THEN v_post := 'Prave kridlo';
+          When 'c' THEN v_post := 'Centr';
+          When 'd' THEN v_post := 'Obrance';
+        END CASE;      
+        DBMS_OUTPUT.PUT_LINE(v_post || ':' || jeden_hrac.hrac_jmeno || ' - ' || jeden_hrac.maxGoals);
+      END LOOP;
+  END LOOP;
+END;
+
+execute PrintNejlepsiHraci(1, 13);
+
+/*
+ * DAIS 2013/2014
+ * cv-3_task-2_2.sql
+ */
+CREATE OR REPLACE PROCEDURE VlozZapas(p_nazev_ligy Liga.nazev%TYPE, p_nazev_rocnik Rocnik.nazev%TYPE, p_poradi_kola Zapas.poradi_kola%TYPE, 
+                                      p_domaci Zapas.domaci1%TYPE, p_hoste Zapas.hoste1%TYPE, p_datum Zapas.datum%TYPE, p_skore_domaci Zapas.skore_domaci%TYPE, 
+									  p_skore_hoste Zapas.skore_hoste%TYPE, p_navsteva Zapas.navsteva%TYPE)
+AS
+  v_id_rocnik Rocnik.idRocnik%TYPE;
+BEGIN
+  SELECT idRocnik INTO v_id_rocnik FROM Rocnik 
+    JOIN Liga ON Rocnik.idLiga = Rocnik.idLiga
+    WHERE Rocnik.nazev = p_nazev_rocnik AND Liga.nazev = p_nazev_ligy;
+
+  INSERT INTO Zapas(idRocnik, poradi_kola, domaci1, hoste1, datum, skore_domaci, skore_hoste, navsteva) 
+  VALUES(v_id_rocnik, p_poradi_kola, p_domaci, p_hoste, p_datum, p_skore_domaci, p_skore_hoste, p_navsteva);
+  
+  IF p_skore_domaci > p_skore_hoste THEN
+    UPDATE Ucastnik SET body = body + 2 WHERE idRocnik = v_id_rocnik AND idTym = p_domaci;
+  ELSE IF p_skore_domaci < p_skore_hoste THEN
+    UPDATE Ucastnik SET body = body + 2 WHERE idRocnik = v_id_rocnik AND idTym = p_hoste;
+  ELSE
+    UPDATE Ucastnik SET body = body + 1 WHERE idRocnik = v_id_rocnik AND idTym IN (p_domaci, p_hoste);
+  END IF;
+  COMMIT;
+END;
+
+
+/*
+ * DAIS 2013/2014
+ * cv-3_task-3_1.sql
+ */
+CREATE OR REPLACE PROCEDURE VypisRocniky
+as
+  cursor vypisrocniky_cursor is select Liga.NAZEV as liga_nazev, rocnik.nazev as rocnik_nazev, idRocnik, zacatek, konec
+                                from rocnik join liga on Rocnik.idLiga = liga.idLiga 
+								where zacatek <= current_date and trunc(current_date) <= konec;
+  poradi number;
+begin
+  for rocnik_radek in vypisrocniky_cursor loop
+    poradi := 1;
+    dbms_output.put_line(rocnik_radek.liga_nazev || ':' || rocnik_radek.rocnik_nazev || ' od: ' || rocnik_radek.zacatek || ' do: ' || rocnik_radek.konec );
+    dbms_output.put_line('Poradí Název Pocet bodu');
+    for ucastnik_radek in (select nazev, body from ucastnik join tym on ucastnik.idTym = tym.idTym where ucastnik.idrocnik = rocnik_radek.idRocnik order by ucastnik.body desc) loop
+        dbms_output.put_line(poradi || '. ' || ucastnik_radek.nazev || ' ' || ucastnik_radek.body);
+        poradi := poradi + 1;
+    end loop;
+  end loop;
+end VypisRocniky;
+
+/*
+ * DAIS 2013/2014
+ * cv-3_task-3_2.sql
+ */
+CREATE OR REPLACE PROCEDURE VlozZapas(p_nazev_ligy Liga.nazev%TYPE, p_nazev_rocnik Rocnik.nazev%TYPE, p_poradi_kola Zapas.poradi_kola%TYPE, 
+                                      p_domaci Zapas.domaci1%TYPE, p_hoste Zapas.hoste1%TYPE, p_datum Zapas.datum%TYPE, p_skore_domaci Zapas.skore_domaci%TYPE, 
+									  p_skore_hoste Zapas.skore_hoste%TYPE, p_navsteva Zapas.navsteva%TYPE)
+AS
+  v_id_liga Liga.idLiga%TYPE;
+  v_id_rocnik Rocnik.idRocnik%TYPE;
+BEGIN
+  SELECT idLiga INTO v_id_liga FROM Liga WHERE nazev = p_nazev_ligy;
+  SELECT idRocnik INTO v_id_rocnik FROM Rocnik WHERE nazev = p_nazev_rocnik AND idLiga = v_id_liga;
+  INSERT INTO Zapas(idRocnik, poradi_kola, domaci1, hoste1, datum, skore_domaci, skore_hoste, navsteva) 
+  VALUES(v_id_rocnik, p_poradi_kola, p_domaci, p_hoste, p_datum, p_skore_domaci, p_skore_hoste, p_navsteva);
+  
+  IF p_skore_domaci > p_skore_hoste THEN
+    UPDATE Ucastnik SET body = body + 2 WHERE idRocnik = v_id_rocnik AND idTym = p_domaci;
+  ELSE IF p_skore_domaci < p_skore_hoste THEN
+    UPDATE Ucastnik SET body = body + 2 WHERE idRocnik = v_id_rocnik AND idTym = p_hoste;
+  ELSE
+    UPDATE Ucastnik SET body = body + 1 WHERE idRocnik = v_id_rocnik AND idTym = p_domaci;
+    UPDATE Ucastnik SET body = body + 1 WHERE idRocnik = v_id_rocnik AND idTym = p_hoste;
+  END IF;
+  COMMIT;
+END;
+
+ 

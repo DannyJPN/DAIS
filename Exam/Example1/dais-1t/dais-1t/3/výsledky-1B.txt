@@ -1,0 +1,65 @@
+======================================1======================================
+CREATE OR ALTER PROCEDURE PrintBranchOfficeStatistics @obYear INT
+AS
+DECLARE @entNum INT;
+DECLARE @pId INT;
+DECLARE @cena INT;
+DECLARE @prumCena INT;
+DECLARE @ks INT;
+DECLARE @avgKs INT;
+DECLARE cu CURSOR FOR 
+SELECT test.pobocka.pId, SUM(test.polozka.cena * test.polozka.kusu) AS cena, 
+ROUND(AVG(test.polozka.cena * test.polozka.kusu), 2) AS prum_cena, SUM(test.polozka.kusu) AS ks, 
+ROUND(AVG(test.polozka.kusu), 2) AS avg_ks
+FROM test.pobocka 
+JOIN test.zamestnanec ON test.pobocka.pId = test.zamestnanec.pId 
+JOIN test.objednavka ON test.objednavka.zaId = test.zamestnanec.zaId 
+JOIN test.polozka ON test.polozka."oID" = test.objednavka."oID"
+GROUP BY test.pobocka.pId, YEAR(test.objednavka.vytvorena) 
+HAVING YEAR(test.objednavka.vytvorena) = @obYear;
+BEGIN
+	SET @entNum = 0;
+	OPEN cu
+	FETCH NEXT FROM cu INTO @pId, @cena, @prumCena, @ks, @avgKs
+	PRINT 'pId | sumPrice (kè) | avgPrice (kè) | sumPieces (ks) | avgPieces (ks)';
+	PRINT '=====================================================================';
+	WHILE @@FETCH_STATUS = 0  
+	BEGIN
+	  SET @entNum = @entNum + 1;
+      	  PRINT CAST(@pId AS CHAR(2)) + ' | ' + CAST(@cena AS CHAR(10)) + ' | ' + CAST(@prumCena AS CHAR(10)) + ' | ' + CAST(@ks AS CHAR(10)) + ' | ' + CAST(@ks AS CHAR(10)) + ' | ' + CAST(@avgKs AS CHAR(10))
+	  FETCH NEXT FROM cu INTO @pId, @cena, @prumCena, @ks, @avgKs;
+	END 
+	PRINT '=====================================================================';
+	PRINT 'Final number of entries: ' + CAST(@entNum AS CHAR(5));
+	CLOSE cu  
+	DEALLOCATE cu 
+END
+GO
+
+======================================2======================================
+CREATE OR ALTER TRIGGER UPDATECOMMODITYTRIGGER ON test.zbozi 
+INSTEAD OF UPDATE
+AS
+DECLARE @zid INT;
+DECLARE @aktualniCena INT;
+DECLARE @aktualniCenaUpdated INT;
+DECLARE @rokVyroby INT;
+DECLARE @rokVyrobyUpdated INT;
+DECLARE @kategorie INT;
+DECLARE @kategorieUpdated INT;
+DECLARE @nazev VARCHAR(30);
+DECLARE @nazevUpdated VARCHAR(30);
+BEGIN
+   SELECT @zid = zid, @nazevUpdated = nazev, @kategorieUpdated = kategorie, @aktualniCenaUpdated = aktualni_cena, @rokVyrobyUpdated = rok_vyroby FROM inserted;
+
+   SELECT @aktualniCena = test.zbozi.aktualni_cena, @rokVyroby = test.zbozi.rok_vyroby, @kategorie = test.zbozi.kategorie, @nazev = test.zbozi.nazev 
+   FROM test.zbozi WHERE test.zbozi.zid = @zid;
+
+   IF @aktualniCenaUpdated >= 0 AND @rokVyrobyUpdated <= YEAR((SELECT CAST(GETDATE() AS DATE)))
+   BEGIN       
+	UPDATE test.zbozi SET nazev = @nazevUpdated, kategorie = @kategorieUpdated, rok_vyroby = @rokVyrobyUpdated, aktualni_cena = @aktualniCenaUpdated WHERE zId = @zId;
+	UPDATE test.polozka SET cena = @aktualniCenaUpdated WHERE test.polozka.zId = @zid AND test.polozka.oID IN (SELECT test.objednavka.oID FROM test.objednavka WHERE test.objednavka.potvrzena IS NULL);
+	INSERT INTO test.zbozihistorie VALUES (@zid, @kategorie, @nazev, @rokVyroby, @aktualniCena);
+   END
+END
+GO

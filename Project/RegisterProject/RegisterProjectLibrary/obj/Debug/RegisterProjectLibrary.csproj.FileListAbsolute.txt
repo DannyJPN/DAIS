@@ -1,0 +1,6 @@
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\RegisterProject\RegisterProjectLibrary\bin\Debug\RegisterProjectLibrary.dll
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\RegisterProject\RegisterProjectLibrary\bin\Debug\RegisterProjectLibrary.pdb
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\RegisterProject\RegisterProjectLibrary\obj\Debug\RegisterProjectLibrary.csprojAssemblyReference.cache
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\RegisterProject\RegisterProjectLibrary\obj\Debug\RegisterProjectLibrary.csproj.CoreCompileInputs.cache
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\RegisterProject\RegisterProjectLibrary\obj\Debug\RegisterProjectLibrary.dll
+C:\Users\Dan Krupa\Dropbox\UNI\VSB\VSB\BC_IVT_II\S4\DAIS\Project\RegisterProject\RegisterProjectLibrary\obj\Debug\RegisterProjectLibrary.pdb
